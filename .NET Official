@@ -1,0 +1,517 @@
+ 
+Implement exception handling in C# console applications 
+Common scenarios that require exception handling
+There are several programming scenarios that require exception handling. Many of these scenarios involve some form of data acquisition. Although some of the scenarios involve coding techniques that are outside the scope of this training, they're still worth noting.
+Common scenarios that require exception handling include:
+•	User input: Exceptions can occur when code processes user input. For example, exceptions occur when the input value is in the wrong format or out of range.
+•	Data processing and computations: Exceptions can occur when code performs data calculations or conversions. For example, exceptions occur when code attempts to divide by zero, cast to an unsupported type, or assign a value that's out of range.
+•	File input/output operations: Exceptions can occur when code reads from or writes to a file. For example, exceptions occur when the file doesn't exist, the program doesn't have permission to access the file, or the file is in use by another process.
+•	Database operations: Exceptions can occur when code interacts with a database. For example, exceptions occur when the database connection is lost, a syntax error occurs in a SQL statement, or a constraint violation occurs.
+•	Network communication: Exceptions can occur when code communicates over a network. For example, exceptions occur when the network connection is lost, a timeout occurs, or the remote server returns an error.
+•	Other external resources: Exceptions can occur when code communicates with other external resources. Web Services, REST APIs, or third-party libraries, can throw exceptions for various reasons. For example, exceptions occur due to network connections issues, malformed data, etc.
+Exception handling keywords, code blocks, and patterns
+Exception handling in C# is implemented by using the try, catch, and finally keywords. Each of these keywords has an associated code block and can be used to satisfy a specific goal in your approach to exception handling. For example:
+C#Copy
+try
+{   
+   // try code block - code that may generate an exception
+}
+catch
+{   
+   // catch code block - code to handle an exception
+}
+finally
+{   
+   // finally code block - code to clean up resources
+}
+ Note
+The C# language also enables your code to generate an exception object by using the throw keyword. Exception handling scenarios that include using the throw keyword to generate exceptions is covered in a separate module on Microsoft Learn.
+The try code block contains the guarded code that may cause an exception. If the code within a try block causes an exception, the exception is handled by a corresponding catch block.
+The catch code block contains the code that's executed when an exception is caught. The catch block can handle the exception, log it, or ignore it. A catch block can be configured to execute when any exception type occurs, or only when a specific type of exception occurs.
+The finally code block contains code that executes whether an exception occurs or not. The finally block is often used to clean up any resources that are allocated in a try block. For example, ensuring that a variable has the correct or required value assigned to it.
+Exception handling in a C# application is generally implemented using one or more of the following patterns:
+•	The try-catch pattern consists of a try block followed by one or more catch clauses. Each catch block is used to specify handlers for different exceptions.
+•	The try-finally pattern consists of a try block followed by a finally block. Typically, the statements of a finally block run when control leaves a try statement.
+•	The try-catch-finally pattern implements all three types of exception handling blocks. A common scenario for the try-catch-finally pattern is when resources are obtained and used in a try block, exceptional circumstances are managed in a catch block, and the resources are released or otherwise managed in the finally block.
+•	Call stack unwinding is the process that the .NET runtime uses when a C# program encounters an error. It's the same process that you just reviewed.
+•	Returning to the block tower analogy, when you need to remove a block from the tower, you start from the top and remove each block until you reach the one you need. This process is similar to how call stack unwinding works, where each call layer in the stack is like a block in the tower. When the runtime needs to unwind the call stack, it starts from the top and removes each call layer until it reaches the one that has what it needs. In this case, the call layer that it needs is the method that has a catch clause that can handle the exception that occurred.
+
+Create a web API with ASP.NET Core controllers
+
+For local development, we use the .NET CLI (command-line interface) and Visual Studio Code. After you complete this module, you can apply its concepts by using a development environment like Visual Studio (Windows). You can also apply the concepts to continued development through Visual Studio Code (Windows, Linux, and macOS).
+Example scenario
+Suppose you're an employee of a pizza company named Contoso Pizza. Your manager asks you to develop a RESTful service for pizza inventory management as a prerequisite for the company's web storefront and mobile application. The service has to support adding, viewing, modifying, and removing types of pizza; a standardized usage of HTTP verbs better known as create, read, update, delete (CRUD).
+What are we doing?
+In this module, you create a new web API application by using ASP.NET Core, and learn how to run and test it from the command line. Then, you add a data store and a new API controller. Finally, you implement and test the API methods to create, read, update, and delete pizzas from the data store.
+REST in ASP.NET Core
+Completed200 XP
+•	3 minutes
+When you browse to a webpage, the web server communicates with your browser by using HTML, CSS, and JavaScript. For example, If you interact with the page by submitting a sign-in form or selecting a buy button, the browser sends the information back to the web server.
+In a similar way, web servers can communicate with a broad range of clients (browsers, mobile devices, other web servers, and more) by using web services. API clients communicate with the server over HTTP, and the two exchange information by using a data format such as JSON or XML. APIs are often used in single-page applications (SPAs) that perform most of the user-interface logic in a web browser. Communication with the web server primarily happens through web APIs.
+REST: A common pattern for building APIs with HTTP
+Representational State Transfer (REST) is an architectural style for building web services. REST requests are made over HTTP. They use the same HTTP verbs that web browsers use to retrieve webpages and send data to servers. The verbs are:
+•	GET: Retrieve data from the web service.
+•	POST: Create a new item of data on the web service.
+•	PUT: Update an item of data on the web service.
+•	PATCH: Update an item of data on the web service by describing a set of instructions about how the item should be modified. The sample application in this module doesn't use this verb.
+•	DELETE: Delete an item of data on the web service.
+Web service APIs that adhere to REST are called RESTful APIs. They're defined through:
+•	A base URI.
+•	HTTP methods, such as GET, POST, PUT, PATCH, or DELETE.
+•	A media type for the data, such as JavaScript Object Notation (JSON) or XML.
+An API often needs to provide services for a few different but related things. For example, our pizza API might manage pizzas, customers, and orders. We use routing to map URIs (uniform resource identifiers) to logical divisions in our code, so that requests to https://localhost:5000/pizza are routed to PizzaController and requests to https://localhost:5000/order are routed to OrderController.
+Benefits of creating APIs in ASP.NET Core
+With ASP.NET, you can use the same framework and patterns to build both webpages and services. You can reuse model classes and validation logic, and even serve both webpages and services side by side in the same project. This approach has benefits:
+•	Simple serialization: ASP.NET was designed for modern web experiences. Endpoints automatically serialize your classes to properly formatted JSON out of the box. No special configuration is required. You can customize serialization for endpoints that have unique requirements.
+•	Authentication and authorization: For security, API endpoints have built-in support for industry-standard JSON Web Tokens (JWTs). Policy-based authorization gives you the flexibility to define powerful access-control rules in code.
+•	Routing alongside your code: ASP.NET lets you define routes and verbs inline with your code by using attributes. Data from the request path, query string, and request body are automatically bound to method parameters.
+•	HTTPS by default: HTTPS is an important part of modern, professional web APIs. It relies on end-to-end encryption to provide privacy and to help ensure that your API calls aren't intercepted and altered between client and server.
+ASP.NET provides support for HTTPS out of the box. It automatically generates a test certificate and easily imports it to enable local HTTPS, so you can run and debug your applications securely before you publish them.
+Share code and knowledge with .NET apps
+You can use your .NET skills and ecosystem to share logic from your web API to other apps built with .NET, including mobile, web, desktop, and services.
+Testing web APIs by using the .NET HTTP REPL
+When you're developing a traditional website, you usually view and test your work in a web browser. Web APIs accept and return data rather than HTML, so a web browser isn't the best web-API testing tool.
+One of the easiest options for exploring and interacting with web APIs is the .NET HTTP REPL (read-evaluate-print loop). It's a simple and popular way to build interactive command-line environments. In the next unit, you create a simple web API and then interact with it by using the .NET HTTP REPL.
+Exercise - Create a web API project
+Completed100 XP
+•	8 minutes
+This module uses the .NET 8.0 SDK. Ensure that you have .NET 8.0 installed by running the following command in your preferred command terminal:
+.NET CLICopy
+dotnet --list-sdks
+Output similar to the following example appears:
+ConsoleCopy
+6.0.317 [C:\Program Files\dotnet\sdk]
+7.0.401 [C:\Program Files\dotnet\sdk]
+8.0.100 [C:\Program Files\dotnet\sdk]
+Ensure that a version that starts with 8 is listed. If none is listed or the command isn't found, install the most recent .NET 8.0 SDK.
+Create and explore a web API project
+To set up a .NET project to work with the web API, we use Visual Studio Code. Visual Studio Code includes an integrated terminal that makes creating a new project easy. If you don't want to use a code editor, you can run the commands in this module in a terminal.
+1.	In Visual Studio Code, select File > Open Folder.
+2.	Create a new folder named ContosoPizza in the location of your choice, and then choose Select Folder.
+3.	Open the integrated terminal from Visual Studio Code by selecting View > Terminal from the main menu.
+4.	In the terminal window, copy and paste the following command:
+.NET CLICopy
+dotnet new webapi -controllers -f net8.0
+This command creates the files for a basic web API project that uses controllers, along with a C# project file named ContosoPizza.csproj that returns a list of weather forecasts. If you get an error, ensure that you have the .NET 8 SDK installed.
+ Important
+Web API projects are secured with https by default. If you have problems, configure the ASP.NET Core HTTPS development certificate.
+You might receive a prompt from Visual Studio Code to add assets to debug the project. Select Yes in the dialog.
+The command uses an ASP.NET Core project template aliased as webapi to scaffold a C#-based web API project. A ContosoPizza directory is created. This directory contains an ASP.NET Core project running on .NET. The project name matches the ContosoPizza directory name.
+You should now have access to these files and directories:
+BashCopy
+-| Controllers
+-| obj
+-| Properties
+-| appsettings.Development.json
+-| appsettings.json
+-| ContosoPizza.csproj
+-| ContosoPizza.http
+-| Program.cs
+-| WeatherForecast.cs
+5.	Examine the following files and directories:
+Expand table
+Name	Description
+Controllers/	Contains classes with public methods exposed as HTTP endpoints.
+Program.cs	Configures services and the app's HTTP request pipeline, and contains the app's managed entry point.
+ContosoPizza.csproj	Contains configuration metadata for the project.
+ContosoPizza.http	Contains configuration to test REST APIs directly from Visual Studio Code.
+Build and test the web API
+1.	Run the following .NET Core CLI command in the command shell:
+.NET CLICopy
+dotnet run
+The preceding command:
+•	Locates the project file at the current directory.
+•	Retrieves and installs any required project dependencies for this project.
+•	Compiles the project code.
+•	Hosts the web API with the ASP.NET Core Kestrel web server at both an HTTP and HTTPS endpoint.
+A port from 5000 to 5300 is selected for HTTP, and from 7000 to 7300 for HTTPS, when the project is created. You can easily change the ports that you use during development by editing the project's launchSettings.json file. This module uses the secure localhost URL that begins with https.
+You should get output similar to the following, indicating that your app is running:
+ConsoleCopy
+Building...
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: https://localhost:7294
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5118 
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development        
+If you're running this app on your own machine, you could direct a browser to the HTTPS link displayed in the output (in the preceding case, https://localhost:7294) to view the resulting page. Remember this port, because you use it throughout the module where {PORT} is used.
+ Important
+Check the terminal output if you encounter any unexpected behavior. If the build fails or other errors occur, the log file's information helps you troubleshoot. As you make changes to the code, you'll need to stop the web API by selecting CTRL+C on the keyboard and rerunning the dotnet run command.
+2.	Open a web browser and go to:
+BashCopy
+https://localhost:{PORT}/weatherforecast
+You should see JSON output similar to this example:
+JSONCopy
+[
+    {
+    "date": "2021-11-09T20:36:01.4678814+00:00",
+    "temperatureC": 33,
+    "temperatureF": 91,
+    "summary": "Scorching"
+    },
+    {
+    "date": "2021-11-09T20:36:01.4682337+00:00",
+    "temperatureC": -8,
+    "temperatureF": 18,
+    "summary": "Cool"
+    },
+    // ...
+]
+Optional: Explore with .http files
+Included in the project is ContosoPizza.http, a file that is used to test API endpoints through a standard format. .http files are supported in several Integrated development environments (IDEs) including Visual Studio and inside of Visual Studio Code with the REST Client extension installed.
+1.	Open the ContosoPizza.http file.
+In some IDEs, this file is preconfigured with the @ContosoPizza_HostAddress variables and a GET command calling /weatherforecast/ that accepts application/json.
+2.	If it's present in your file, select the Sent Request command above the GET which sends a request to the running service.
+Calling this command opens a response window with output similar to what we saw in the browser:
+OutputCopy
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json; charset=utf-8
+Date: Wed, 17 Jan 2024 16:46:40 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+[
+    {
+        "date": "2024-01-18",
+        "temperatureC": -2,
+        "temperatureF": 29,
+        "summary": "Warm"
+    },
+    {
+        "date": "2024-01-19",
+        "temperatureC": 24,
+        "temperatureF": 75,
+        "summary": "Chilly"
+    },
+    // ..
+]
+Optional: Explore APIs with Command Line HTTP REPL
+1.	Open a new integrated terminal from Visual Studio Code by selecting Terminal > New Terminal from the main menu, then run the following command:
+.NET CLICopy
+dotnet tool install -g Microsoft.dotnet-httprepl
+The preceding command installs the .NET HTTP Read-Eval-Print Loop (REPL) command-line tool that you use to make HTTP requests to the web API.
+2.	Connect to the web API by running the following command:
+.NET CLICopy
+httprepl https://localhost:{PORT}
+Alternatively, run the following command at any time while HttpRepl is running:
+.NET CLICopy
+connect https://localhost:{PORT}
+ Tip
+If the HttpRepl tool warns Unable to find an OpenAPI description, the most likely cause is an untrusted development certificate. HttpRepl requires a trusted connection. Before you can continue, you must configure your system to trust the dev certificate with dotnet dev-certs https --trust
+3.	Explore available endpoints by running the following command:
+.NET CLICopy
+ls
+The preceding command detects all APIs available on the connected endpoint and lists them, as in the following output:
+OutputCopy
+https://localhost:{PORT}/> ls
+.                 []
+WeatherForecast   [GET] 
+4.	Go to the WeatherForecast endpoint by running the following command:
+.NET CLICopy
+cd WeatherForecast
+The preceding command shows an output of available APIs for the WeatherForecast endpoint:
+OutputCopy
+https://localhost:{PORT}/> cd WeatherForecast
+/WeatherForecast    [GET]
+5.	Make a GET request in HttpRepl by using the following command:
+.NET CLICopy
+get
+The preceding command makes a GET request similar to going to the endpoint in the browser:
+OutputCopy
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Fri, 02 Apr 2021 17:31:43 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+[
+    {
+    "date": 4/3/2021 10:31:44 AM,
+    "temperatureC": 13,
+    "temperatureF": 55,
+    "summary": "Sweltering"
+    },
+    {
+    "date": 4/4/2021 10:31:44 AM,
+    "temperatureC": -13,
+    "temperatureF": 9,
+    "summary": "Warm"
+    },
+    // ..
+]
+6.	End the current HttpRepl session by using the following command:
+.NET CLICopy
+exit
+7.	Return to the dotnet terminal in the drop-down list in Visual Studio Code. Shut down the web API by selecting CTRL+C on your keyboard.
+ASP.NET Core Web API Controllers
+Completed200 XP
+•	4 minutes
+In the previous exercise, you created a web application that provides sample weather forecast data, then interacted with it in the HTTP Read-Eval-Print Loop (REPL).
+Before you dive in to writing your own PizzaController class, let's look at the code in the WeatherController sample to understand how it works. In this unit, you learn how WeatherController uses the ControllerBase base class and a few .NET attributes to build a functional web API in a few dozen lines of code. After you understand those concepts, you're ready to write your own PizzaController class.
+Here's the code for the entire WeatherController class. Don't worry if it doesn't make sense yet. Let's go through it step by step.
+C#Copy
+using Microsoft.AspNetCore.Mvc;
+
+namespace ContosoPizza.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class WeatherForecastController : ControllerBase
+{
+    private static readonly string[] Summaries = new[]
+    {
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
+
+    private readonly ILogger<WeatherForecastController> _logger;
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    {
+        _logger = logger;
+    }
+
+    [HttpGet(Name = "GetWeatherForecast")]
+    public IEnumerable<WeatherForecast> Get()
+    {
+        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        {
+            Date = DateTime.Now.AddDays(index),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+        })
+        .ToArray();
+    }
+}
+
+The base class: ControllerBase
+A controller is a public class with one or more public methods known as actions. By convention, a controller is placed in the project root's Controllers directory. The actions are exposed as HTTP endpoints via routing. So an HTTP GET request to https://localhost:{PORT}/weatherforecast causes the Get() method of the WeatherForecastController class to be executed.
+The first thing to notice is that this class inherits from the ControllerBase base class. This base class provides much standard functionality for handling HTTP requests, so you can focus on the specific business logic for your application.
+ Note
+If you have experience with Razor Pages or model-view-controller (MVC) architecture development in ASP.NET Core, you've used the Controller class. Don't create a web API controller by deriving from the Controller class. Controller derives from ControllerBase and adds support for views, so it's for handling webpages, not web API requests.
+API controller class attributes
+Two important attributes are applied to WeatherForecastController, as shown in the following code:
+C#Copy
+[ApiController]
+[Route("[controller]")]
+public class WeatherForecastController : ControllerBase
+[ApiController] enables opinionated behaviors that make it easier to build web APIs. Some behaviors include parameter source inference, attribute routing as a requirement, and model validation error-handlingenhancements*.
+[Route] defines the routing pattern [controller]. The controller's name (case-insensitive, without the Controller suffix) replaces the [controller] token. This controller handles requests to https://localhost:{PORT}/weatherforecast.
+ Note
+The route might contain static strings, as in api/[controller]. In this example, this controller would handle a request to https://localhost:{PORT}/api/weatherforecast.
+Providing weather results with the Get() method
+WeatherForecastController includes a single controller action, designated by the [HttpGet(Name = "GetWeatherForecast")] attribute. This attribute routes HTTP GET requests to the public IEnumerable<WeatherForecast> Get() method. As you saw in the previous exercise, requests to https://localhost:{PORT}/weatherforecast caused the weather results to be returned.
+As you learn later in this module, other common actions are associated with a web API that performs CRUD operations (GET, PUT, POST, DELETE). But an API controller needs to implement only one controller action.
+In this case, you're getting the full list of WeatherForecast items returned. The GET operation also allows for retrieving a single item by passing in an identifier. In ASP.NET, you can retrieve a single item by using the [HttpGet("{id}")] attribute. You'll implement that attribute in the next exercise.
+Now that you know the fundamental components of a web API controller, you're ready to create your own PizzaController class.
+Exercise - Add a data store
+Completed100 XP
+•	4 minutes
+Before you start to implement a web API for pizza, you need to have a data store on which you can perform operations.
+You need a model class to represent a pizza in your inventory. The model contains properties that represent the characteristics of a pizza. The model is used to pass data in the web API and to persist pizza options in the data store.
+In this unit, that data store is a simple local in-memory caching service. In a real-world application, you'd consider using a database, such as SQL Server, with Entity Framework Core.
+Create a pizza model
+1.	Run the following command to create a Models folder:
+BashCopy
+mkdir Models
+Select the Models folder in Visual Studio Code and add a new file called Pizza.cs.
+ 
+The project root now contains a Models directory with an empty Pizza.cs file. The directory name Models is a convention. The directory name comes from the model-view-controller architecture that the web API uses.
+2.	Add the following code to Models/Pizza.cs and save your changes. This class defines a pizza.
+C#Copy
+namespace ContosoPizza.Models;
+
+public class Pizza
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public bool IsGlutenFree { get; set; }
+}
+Add a data service
+1.	Run the following command to create a Services folder:
+BashCopy
+mkdir Services
+Select the folder in Visual Studio Code and add a new file called PizzaService.cs.
+ 
+2.	Add the following code to Services/PizzaService.cs and save your changes. This code creates an in-memory pizza data service.
+C#Copy
+using ContosoPizza.Models;
+
+namespace ContosoPizza.Services;
+
+public static class PizzaService
+{
+    static List<Pizza> Pizzas { get; }
+    static int nextId = 3;
+    static PizzaService()
+    {
+        Pizzas = new List<Pizza>
+        {
+            new Pizza { Id = 1, Name = "Classic Italian", IsGlutenFree = false },
+            new Pizza { Id = 2, Name = "Veggie", IsGlutenFree = true }
+        };
+    }
+
+    public static List<Pizza> GetAll() => Pizzas;
+
+    public static Pizza? Get(int id) => Pizzas.FirstOrDefault(p => p.Id == id);
+
+    public static void Add(Pizza pizza)
+    {
+        pizza.Id = nextId++;
+        Pizzas.Add(pizza);
+    }
+
+    public static void Delete(int id)
+    {
+        var pizza = Get(id);
+        if(pizza is null)
+            return;
+
+        Pizzas.Remove(pizza);
+    }
+
+    public static void Update(Pizza pizza)
+    {
+        var index = Pizzas.FindIndex(p => p.Id == pizza.Id);
+        if(index == -1)
+            return;
+
+        Pizzas[index] = pizza;
+    }
+}
+This service provides a simple in-memory data caching service with two pizzas by default. Our web API uses that service for demo purposes. When you stop and start the web API, the in-memory data cache is reset to the two default pizzas from the constructor of PizzaService.
+Build the web API project
+Run the following command to build the app:
+.NET CLICopy
+dotnet build
+The build succeeds with no warnings. If the build fails, check the output for troubleshooting information.
+In the next unit, you'll create a controller that will use the Pizza model and PizzaService class.
+Exercise - Add a controller
+Completed100 XP
+•	5 minutes
+A controller is a public class with one or more public methods known as actions. By convention, a controller is placed in the project root's Controllers directory. The actions are exposed as HTTP endpoints inside the web API controller.
+Optional: Test the controller with Command Line HTTP Read-Eval-Print Loop (REP
+CRUD actions in ASP.NET Core
+Completed200 XP
+•	5 minutes
+Our pizza service supports CRUD operations for a list of pizzas. These operations are performed through HTTP verbs, which are mapped via ASP.NET Core attributes. As you saw, the HTTP GET verb is used to retrieve one or more items from a service. Such an action is annotated with the [HttpGet] attribute.
+The following table shows the mapping of the four operations that you're implementing for the pizza service:
+Expand table
+HTTP action verb	CRUD operation	ASP.NET Core attribute
+GET	Read	[HttpGet]
+POST	Create	[HttpPost]
+PUT	Update	[HttpPut]
+DELETE	Delete	[HttpDelete]
+Guided project - Create an AI travel agent
+Suppose you're a developer for Margie's Travel, a global leader in the travel and hospitality industry. The company offers a wide range of services, including flight bookings, hotel reservations, guided tours, and vacation packages. Margie's Travel has a strong global presence, with offices and partners in major cities worldwide. With a commitment to delivering exceptional travel experiences, Margie's Travel is continuously exploring innovative technologies to enhance customer interactions 
+and streamline travel planning. Now they're exploring the integration of cutting-edge artificial intelligence (AI) technology to enhance their services.
+To provide travelers with personalized and immersive travel experiences, Margie's Travel decides to integrate a chatbot application into its digital platform. This chatbot, named "TravelBot", is a virtual travel assistant, helping customers plan their trips, discover new destinations, and create detailed itineraries.
+You're tasked with creating a proof of concept for TravelBot, demonstrating its ability to understand natural language queries, provide intelligent responses, and assist travelers in planning their trips. To power TravelBot's intelligence and conversational capabilities, you choose to use the Semantic Kernel SDK.
+This module guides you through the steps required to develop a proof of concept AI Travel assistant chatbot using the Semantic Kernel SDK. By the end of this module, you complete a small chatbot application that can understand user queries, generate intelligent responses, and provide personalized travel recommendations.
+ Note
+This is a guided project module where you complete an end-to-end project by following step-by-step instructions. 
+Learning objectives
+In this module, you practice how to:
+•	Create plugins for the Semantic Kernel.
+•	Create prompts to elicit the best responses from the large language model (LLM).
+•	Manipulate LLM responses to guide the execution of code.
+•	Automatically invoke the correct plugins to complete tasks.
+Prerequisites
+•	Experience programming in C#.
+•	Visual Studio Code IDE installed.
+•	Familiarity with Azure and the Azure portal.
+•	Access to Azure OpenAI Services.
+•	Experience creating plugins using the Semantic Kernel SDK.
+•	Experience using Semantic Kernel auto function calling.
+
+Create a new .NET project and work with dependencies
+
+Manage dependency updates in your .NET project
+Completed100 XP
+•	4 minutes
+Sooner or later, you'll want to update to a new version of a library. Maybe a function is marked as deprecated, or maybe there's a new feature in a later version of a package you're using.
+Take these considerations into account before you try to update a library:
+•	The type of update: What type of update is available? Is it a small bug fix? Is it adding a new feature that you need? Will it break your code? You can communicate the type of update by using a system called semantic versioning. The way the library's version number is expressed communicates to developers the type of update with which they're dealing.
+•	Whether the project is configured correctly: You can configure your .NET project so that you get only the types of updates you want. You'll perform an update only if a specific type of update is available. We recommend this approach, because you don't risk running into surprises.
+•	Security problems: Managing your project dependencies over time involves being aware of problems that might happen. Problems arise as vulnerabilities are detected, for example. Ideally, patches will be released that you can download. The .NET Core tool helps you run an audit on your libraries to find out if you have packages that should be updated. It also helps you take the appropriate action to fix a problem.
+Use semantic versioning
+There's an industry standard called semantic versioning, which is how you express the type of change that you or some other developer is introducing to a library. Semantic versioning works by ensuring that a package has a version number, and that the version number is divided into these sections:
+•	Major version: The leftmost number. For example, it's the 1 in 1.0.0. A change to this number means that you can expect breaking changes in code. You might need to rewrite part of your code.
+•	Minor version: The middle number. For example, it's the 2 in 1.2.0. A change to this number means that features have been added. Your code should still work. It's generally safe to accept the update.
+•	Patch version: The rightmost number. For example, it's the 3 in 1.2.3. A change to this number means that a change has been applied that fixes something in the code that should have worked. It should be safe to accept the update.
+This table illustrates how the version number changes for each version type:
+Expand table
+Type	What happens
+Major version	1.0.0 changes to 2.0.0
+Minor version	1.1.1 changes to 1.2.0
+Patch version	1.0.1 changes to 1.0.2
+Many companies and developers have adopted this system. If you intend to publish packages and push them to the NuGet registry, you should follow semantic versioning; it's expected. Even if you only download packages from the NuGet registry, you can expect these packages to follow semantic versioning.
+Changes to a package can introduce risk, including the risk that a bug might harm your business. Some risks might require you to rewrite part of your code. Rewriting code takes time and costs money.
+Update approach
+As a .NET developer, you can communicate the update behavior that you want to .NET. Think about updating in terms of risk. Here are some approaches:
+•	Major version: I'm OK with updating to the latest major version as soon as it's out. I accept the fact that I might need to change code on my end.
+•	Minor version: I'm OK with a new feature being added. I'm not OK with code that breaks.
+•	Patch version: The only updates I'm OK with are bug fixes.
+If you're managing a new or smaller .NET project, you can afford to be loose with how you define the update strategy. For example, you can always update to the latest version. For more complex projects, there's more nuance, but we'll save that for a future module.
+In general, the smaller the dependency you're updating, the fewer dependencies it has and the more likely that the update process will be easy.
+Configure the project file for update
+When you're adding one or more dependencies, think about configuring your project file so that you get predictable behavior when you restore, build, or run your project. You can communicate the approach that you want to take for a package. NuGet has the concepts of version ranges and floating versions.
+Let's first talk about version ranges. This is special notation that's used for specifying specific version ranges that you want to have resolved.
+Expand table
+Notation	Applied rule	Description
+1.0	x >= 1.0	Minimum version, inclusive
+(1.0,)	x > 1.0	Minimum version, exclusive
+[1.0]	x == 1.0	Exact version match
+(,1.0]	x ≤ 1.0	Maximum version, inclusive
+(,1.0)	x < 1.0	Maximum version, exclusive
+[1.0,2.0]	1.0 ≤ x ≤ 2.0	Exact range, inclusive
+(1.0,2.0)	1.0 < x < 2.0	Exact range, exclusive
+[1.0,2.0)	1.0 ≤ x < 2.0	Mixed inclusive minimum and exclusive maximum version
+(1.0)	invalid	invalid
+NuGet also supports using a floating version notation for major, minor, patch, and pre-release suffix parts of the number. This notation is an asterisk (*). For example, the version specification 6.0.* says "use the latest 6.0.x version." In another example, 4.* means "use the latest 4.x version." Using a floating version reduces changes to the project file while keeping up to date with the latest version of a dependency.
+ Note
+We recommend installing a specific version instead of using any of the floating notations. Installing a specific version ensures that your builds are repeatable unless you explicitly request an update to a dependency.
+When you're using a floating version, NuGet resolves the latest version of a package that matches the version pattern. In the following example, 6.0.* gets the latest version of a package that starts with 6.0. That version is 6.0.1.
+ 
+Here are some examples that can configure for major, minor, or patch version:
+XMLCopy
+<!-- Accepts any version 6.1 and later. -->
+<PackageReference Include="ExamplePackage" Version="6.1" />
+
+<!-- Accepts any 6.x.y version. -->
+<PackageReference Include="ExamplePackage" Version="6.*" />
+<PackageReference Include="ExamplePackage" Version="[6,7)" />
+
+<!-- Accepts any later version, but not including 4.1.3. Could be
+     used to guarantee a dependency with a specific bug fix. -->
+<PackageReference Include="ExamplePackage" Version="(4.1.3,)" />
+
+<!-- Accepts any version earlier than 5.x, which might be used to prevent pulling in a later
+     version of a dependency that changed its interface. However, we don't recommend this form because determining the earliest version can be difficult. -->
+<PackageReference Include="ExamplePackage" Version="(,5.0)" />
+
+<!-- Accepts any 1.x or 2.x version, but not 0.x or 3.x and later. -->
+<PackageReference Include="ExamplePackage" Version="[1,3)" />
+
+<!-- Accepts 1.3.2 up to 1.4.x, but not 1.5 and later. -->
+<PackageReference Include="ExamplePackage" Version="[1.3.2,1.5)" />
+Find and update outdated packages
+The dotnet list package --outdated command lists outdated packages. This command can help you learn when newer versions of packages are available. Here's a typical output from the command:
+OutputCopy
+Top-level Package      Requested   Resolved   Latest
+> Humanizer            2.7.*       2.7.9      2.8.26
+Here are the meanings of the names of the columns in the output:
+•	Requested: The version or version range that you've specified.
+•	Resolved: The actual version that's been downloaded for the project that matches the specified version.
+•	Latest: The latest version available for update from NuGet.
+The recommended workflow is to run the following commands, in this order:
+1.	Run dotnet list package --outdated. This command lists all the outdated packages. It provides information in the Requested, Resolved, and Latest columns.
+2.	Run dotnet add package <package name>. If you run this command, it will try to update to the latest version. Optionally, you can pass in --version=<version number/range>.
+
+
+1100 XP
+Guided project - Build a chat bot using Azure OpenAI, Azure Cosmos DB for NoSQL, and Blazor
+
+
